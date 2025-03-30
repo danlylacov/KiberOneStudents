@@ -51,6 +51,10 @@
             margin: 8px 0;
             cursor: pointer;
         }
+        .custom-input {
+            display: none;
+            margin-top: 10px;
+        }
         input[type="text"] {
             width: 100%;
             padding: 10px;
@@ -92,10 +96,20 @@
                     <div class="checkbox-group">
                         {% for option in values %}
                             <label>
-                                <input type="checkbox" name="{{ key }}" value="{{ option }}">
+                                <input type="checkbox"
+                                       name="{{ key }}"
+                                       value="{{ option }}"
+                                       {% if "Другое" in option %}
+                                       onchange="toggleCustomInput('{{ key }}', this.checked)"
+                                       {% endif %}>
                                 {{ option }}
                             </label>
                         {% endfor %}
+                        <div class="custom-input" id="custom-{{ key }}">
+                            <input type="text"
+                                   name="{{ key }}_custom"
+                                   placeholder="Введите свой вариант">
+                        </div>
                     </div>
                 </div>
             {% endfor %}
@@ -103,5 +117,15 @@
             <button type="submit">Сгенерировать документ</button>
         </form>
     </div>
+
+    <script>
+        function toggleCustomInput(section, isChecked) {
+            const customInput = document.getElementById(`custom-${section}`);
+            customInput.style.display = isChecked ? 'block' : 'none';
+            if (!isChecked) {
+                customInput.querySelector('input').value = '';
+            }
+        }
+    </script>
 </body>
 </html>

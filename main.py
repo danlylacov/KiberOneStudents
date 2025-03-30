@@ -55,7 +55,7 @@ OPTIONS = {
         "Любит «слепую печать», старается добиться высокого результата\n",
         "Печатает потому, что надо. Но при этом виден прогресс.\n",
         "Не любит печать и всячески противится этому, что сказывается на модулях, в которых необходимо вводить текст с клавиатуры\n",
-        "Другое\n"
+        "Другое\nSwing"
     ],
     "BEHAVIOR": [
         "Поведение хорошее\n",
@@ -64,19 +64,16 @@ OPTIONS = {
         "Другое\n"
     ],
     "RECOMMENDATIONS": [
-     "Укрепление конкретных навыков\n",
-     "Участие в проектах/соревнованиях\n",
-     "Совершенствование межличностных навыков\n"
-
+        "Укрепление конкретных навыков\n",
+        "Участие в проектах/соревнованиях\n",
+        "Совершенствование межличностных навыков\n",
+        "Другое\n"
     ]
 }
-
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Получаем данные из формы
         data = {
             "NAME": request.form.get("NAME", "Без имени"),
             "ACTIVITY": request.form.getlist("ACTIVITY"),
@@ -94,12 +91,16 @@ def index():
         # Обрабатываем "Другое" для каждого раздела
         for key in OPTIONS.keys():
             custom_option = request.form.get(f"{key}_custom", "").strip()
-            if custom_option and "Другое\n" in data[key]:
-                # Заменяем "Другое" на пользовательский текст
-                data[key] = [custom_option + "\n" if item == "Другое\n" else item for item in data[key]]
-            elif "Другое\n" in data[key] and not custom_option:
-                # Удаляем "Другое", если пользователь ничего не ввел
-                data[key] = [item for item in data[key] if item != "Другое\n"]
+            # Нормализуем строки, убирая различия между \n и \r\n
+            normalized_options = [item.replace('\r\n', '\n') for item in data[key]]
+            if "Другое\n" in normalized_options:  # Если выбрано "Другое"
+                if custom_option:  # Если введен пользовательский текст
+                    data[key] = [custom_option + "\n" if item.replace('\r\n', '\n') == "Другое\n" else item for item in data[key]]
+                else:  # Если текст не введен, убираем "Другое"
+                    data[key] = [item for item in data[key] if item.replace('\r\n', '\n') != "Другое\n"]
+
+        # Отладочный вывод данных перед рендерингом
+        print("Данные перед рендерингом:", data)
 
         # Создаем документ
         template_path = "template.docx"
@@ -107,18 +108,15 @@ def index():
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
         output_path = os.path.join(output_folder,
-                                   f"Характеристика_{data['NAME']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx")
+                                 f"Характеристика_{data['NAME']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx")
 
         doc = DocxTemplate(template_path)
         doc.render(data)
         doc.save(output_path)
 
-        # Отправляем файл пользователю
         return send_file(output_path, as_attachment=True)
 
-    # Отображаем форму
     return render_template('index.html', options=OPTIONS)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
