@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Генератор характеристик</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section label {
+            font-weight: bold;
+            color: #34495e;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .checkbox-group {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dcdcdc;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #3498db;
+        }
+        .checkbox-group label {
+            font-weight: normal;
+            color: #555;
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #dcdcdc;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Генератор характеристик резидента KIBERone</h1>
+        <form method="POST">
+            <div class="section">
+                <label>Имя ребенка:</label>
+                <input type="text" name="NAME" required placeholder="Введите имя">
+            </div>
+
+            {% for key, values in options.items() %}
+                <div class="section">
+                    <label>{{ key }}:</label>
+                    <div class="checkbox-group">
+                        {% for option in values %}
+                            <label>
+                                <input type="checkbox" name="{{ key }}" value="{{ option }}">
+                                {{ option }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <button type="submit">Сгенерировать документ</button>
+        </form>
+    </div>
+</body>
+</html>
